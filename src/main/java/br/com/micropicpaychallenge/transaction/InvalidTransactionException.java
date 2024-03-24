@@ -1,4 +1,4 @@
-package br.com.micropicpaychallenge.exception;
+package br.com.micropicpaychallenge.transaction;
 
 public class InvalidTransactionException extends RuntimeException{
 

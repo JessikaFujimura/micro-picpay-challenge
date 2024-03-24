@@ -3,7 +3,7 @@ package br.com.micropicpaychallenge.transaction;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import br.com.micropicpaychallenge.exception.InvalidTransactionException;
+import br.com.micropicpaychallenge.authorization.AuthorizeService;
 import br.com.micropicpaychallenge.wallet.Wallet;
 import br.com.micropicpaychallenge.wallet.WalletRepository;
 import br.com.micropicpaychallenge.wallet.WalletType;
@@ -13,10 +13,12 @@ public class TransactionService {
 
     private final TransactionRepository transactionRepository;
     private final WalletRepository walletRepository;
+    private final AuthorizeService authorizeService;
 
-    public TransactionService(TransactionRepository transactionRepository, WalletRepository walletRepository) {
+    public TransactionService(TransactionRepository transactionRepository, WalletRepository walletRepository, AuthorizeService authorizeService) {
         this.transactionRepository = transactionRepository;
         this.walletRepository = walletRepository;
+        this.authorizeService = authorizeService;
     }
 
     @Transactional
@@ -32,7 +34,8 @@ public class TransactionService {
         walletRepository.save(wallet.debit(transaction.value()));
 
         // Chamar serviços externos
-
+            // Autorizar transação
+        authorizeService.authorize(transaction);
         return transactionPersisted;
     }
 
