@@ -4,6 +4,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import br.com.micropicpaychallenge.authorization.AuthorizeService;
+import br.com.micropicpaychallenge.notification.NotificationService;
 import br.com.micropicpaychallenge.wallet.Wallet;
 import br.com.micropicpaychallenge.wallet.WalletRepository;
 import br.com.micropicpaychallenge.wallet.WalletType;
@@ -14,28 +15,32 @@ public class TransactionService {
     private final TransactionRepository transactionRepository;
     private final WalletRepository walletRepository;
     private final AuthorizeService authorizeService;
+    private final NotificationService notificationService;
 
-    public TransactionService(TransactionRepository transactionRepository, WalletRepository walletRepository, AuthorizeService authorizeService) {
+    public TransactionService(TransactionRepository transactionRepository, WalletRepository walletRepository, AuthorizeService authorizeService, NotificationService notificationService) {
         this.transactionRepository = transactionRepository;
         this.walletRepository = walletRepository;
         this.authorizeService = authorizeService;
+        this.notificationService = notificationService;
     }
 
     @Transactional
     public Transaction createTransaction(Transaction transaction) {
-        // Validar a transação
+        //1- Validar a transação
         validadeTransaction(transaction);
 
-        // Criar a transação
+        //2- Criar a transação
         var transactionPersisted = transactionRepository.save(transaction);
 
-        // Debitar da carteira
+        //3- Debitar da carteira
         var wallet = walletRepository.findById(transaction.payer()).get();
         walletRepository.save(wallet.debit(transaction.value()));
 
-        // Chamar serviços externos
-            // Autorizar transação
+        //4- Chamar serviços externos
+        // Autorizar transação
         authorizeService.authorize(transaction);
+        // Notificar
+        notificationService.notify(transaction);
         return transactionPersisted;
     }
 
