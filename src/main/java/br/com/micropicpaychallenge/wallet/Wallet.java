@@ -5,7 +5,7 @@ import java.math.BigDecimal;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Table;
 
-@Table("WALLET")
+@Table("WALLETS")
 public record Wallet(
     @Id Long id,
     String fullName,

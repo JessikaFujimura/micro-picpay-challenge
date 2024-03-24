@@ -1,14 +1,14 @@
-DELETE FROM WALLETS;  
 DELETE FROM TRANSACTIONS;
+DELETE FROM WALLETS;
 
 INSERT INTO WALLETS(
     ID, FULL_NAME, CPF, EMAIL, "PASSWORD", "TYPE", BALANCE
 ) VALUES (
-    1, "Alice - User", "21265252017", "alice@test.com", "12345", 1, 1500.00
+    1, 'Alice User', 21265252017, 'alice@test.com', '12345', 1, 1500.00
 );
 
 INSERT INTO WALLETS(
     ID, FULL_NAME, CPF, EMAIL, "PASSWORD", "TYPE", BALANCE
 ) VALUES (
-    2, "Mara - ShopKeeper", "22389686010", "mara@test.com", "12345", 2, 10000.00
+    2, 'Mara ShopKeeper', 22389686010, 'mara@test.com', '12345', 2, 10000.00
 );
