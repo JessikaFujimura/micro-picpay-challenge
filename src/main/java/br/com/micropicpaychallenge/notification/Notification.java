@@ -1,4 +1,4 @@
-package br.com.micropicpaychallenge.wallet;
+package br.com.micropicpaychallenge.notification;
 
 public record Notification(boolean message) {
     

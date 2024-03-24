@@ -1,4 +1,4 @@
-package br.com.micropicpaychallenge.wallet;
+package br.com.micropicpaychallenge.transaction;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
