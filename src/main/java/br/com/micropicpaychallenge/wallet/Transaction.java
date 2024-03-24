@@ -21,4 +21,5 @@ public record Transaction(
     public Transaction {
         value = value.setScale(2);
     }
+
 } 
