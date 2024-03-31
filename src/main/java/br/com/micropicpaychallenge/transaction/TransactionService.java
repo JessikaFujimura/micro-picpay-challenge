@@ -35,8 +35,10 @@ public class TransactionService {
         var transactionPersisted = transactionRepository.save(transaction);
 
         //3- Debitar da carteira
-        var wallet = walletRepository.findById(transaction.payer()).get();
-        walletRepository.save(wallet.debit(transaction.value()));
+        var walletPayer = walletRepository.findById(transaction.payer()).get();
+        var walletPayee = walletRepository.findById(transaction.payee()).get();
+        walletRepository.save(walletPayer.debit(transaction.value()));
+        walletRepository.save(walletPayee.credit(transaction.value()));
 
         //4- Chamar serviços externos
         // Autorizar transação
@@ -56,7 +58,7 @@ public class TransactionService {
         walletRepository.findById(transaction.payee())
                 .map(payee -> walletRepository.findById(transaction.payer())
                         .map(payer -> isTransactionValid(transaction, payer) ? transaction : null)
-                        .orElseThrow())
+                        .orElseThrow(() -> new InvalidTransactionException("Invalid Transaction - %s".formatted(transaction))))
                 .orElseThrow(() -> new InvalidTransactionException("Invalid Transaction - %s".formatted(transaction)));
     }
 

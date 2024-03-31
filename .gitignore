@@ -33,3 +33,4 @@ build/
 .vscode/
 
 /src/main/.DS_Store
+data/picpay.mv.db

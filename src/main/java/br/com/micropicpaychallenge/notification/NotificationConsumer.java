@@ -1,5 +1,9 @@
 package br.com.micropicpaychallenge.notification;
 
+import org.apache.logging.log4j.spi.LoggerRegistry;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.http.ResponseEntity;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
@@ -8,6 +12,8 @@ import br.com.micropicpaychallenge.transaction.Transaction;
 
 @Service
 public class NotificationConsumer {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(NotificationService.class);
     
     private RestClient restClient;
 
@@ -19,13 +25,18 @@ public class NotificationConsumer {
 
     @KafkaListener(topics = "transaction-notification", groupId = "micro-picpay-challenge")
     public void receiveNotification(Transaction transaction){
-        var response = restClient
-        .get()
-        .retrieve()
-        .toEntity(Notification.class);
+        LOGGER.info("Notification transaction: {}", transaction);
+        // var response = restClient
+        // .get()
+        // .retrieve()
+        // .toEntity(Notification.class);
+
+        var response = new ResponseEntity<Notification>(new Notification(true), null, 200);
 
         if(response.getStatusCode().isError() || !response.getBody().message()){
             throw new NotificationException("Error sending notification!");
         }
+        LOGGER.info("Transaction notified: {}", transaction);
+
     }
 }
