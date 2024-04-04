@@ -60,13 +60,58 @@ public class TransactionServiceTest {
         when(walletRepository.save(any()))
         .thenReturn(payer)
         .thenReturn(payee);
-        
+
         doNothing().when(authorizeService).authorize(transaction);
         doNothing().when(notificationService).notify(transaction);
 
         var response = transactionService.createTransaction(transaction);
 
         Assertions.assertThat(response).isNotNull();
+    }
+
+    @Test
+    public void testCreateInvalidTransactionWhenBalancePayerIsNotEnougth(){
+        var transaction = new Transaction(null, 2L, 1L, BigDecimal.valueOf(10000L), LocalDateTime.now());
+        var payee = new Wallet(1L, "Fulano", 111111111L, "email@test.com", "12345", WalletType.SHOPKEEPER.getValue(), BigDecimal.valueOf(1000));
+        var payer = new Wallet(2L, "Fulano", 111111111L, "email@test.com", "12345", WalletType.COMMON.getValue(), BigDecimal.valueOf(100));
+
+        when(walletRepository.findById(anyLong()))
+        .thenReturn(Optional.of(payee))
+        .thenReturn(Optional.of(payer));
+        
+        Assertions.assertThatThrownBy(() -> transactionService.createTransaction(transaction))
+        .isInstanceOf(InvalidTransactionException.class)
+        .hasMessageStartingWith("Invalid Transaction");
+    }
+
+    @Test
+    public void testCreateInvalidTransactionWhenPayerIsNotCommonType(){
+        var transaction = new Transaction(null, 2L, 1L, BigDecimal.valueOf(100L), LocalDateTime.now());
+        var payee = new Wallet(1L, "Fulano", 111111111L, "email@test.com", "12345", WalletType.SHOPKEEPER.getValue(), BigDecimal.valueOf(1000));
+        var payer = new Wallet(2L, "Fulano", 111111111L, "email@test.com", "12345", WalletType.SHOPKEEPER.getValue(), BigDecimal.valueOf(1000));
+
+        when(walletRepository.findById(anyLong()))
+        .thenReturn(Optional.of(payee))
+        .thenReturn(Optional.of(payer));
+        
+        Assertions.assertThatThrownBy(() -> transactionService.createTransaction(transaction))
+        .isInstanceOf(InvalidTransactionException.class)
+        .hasMessageStartingWith("Invalid Transaction");
+    }
+
+    @Test
+    public void testCreateInvalidTransactionWhenPayerIdIsEqualPayeeId(){
+        var transaction = new Transaction(null, 1L, 1L, BigDecimal.valueOf(100L), LocalDateTime.now());
+        var payee = new Wallet(1L, "Fulano", 111111111L, "email@test.com", "12345", WalletType.SHOPKEEPER.getValue(), BigDecimal.valueOf(1000));
+        var payer = new Wallet(1L, "Fulano", 111111111L, "email@test.com", "12345", WalletType.COMMON.getValue(), BigDecimal.valueOf(1000));
+
+        when(walletRepository.findById(anyLong()))
+        .thenReturn(Optional.of(payee))
+        .thenReturn(Optional.of(payer));
+        
+        Assertions.assertThatThrownBy(() -> transactionService.createTransaction(transaction))
+        .isInstanceOf(InvalidTransactionException.class)
+        .hasMessageStartingWith("Invalid Transaction");
     }
 
     @Test
