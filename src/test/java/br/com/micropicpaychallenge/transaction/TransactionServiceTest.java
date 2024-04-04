@@ -1,5 +1,8 @@
 package br.com.micropicpaychallenge.transaction;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 
 import java.math.BigDecimal;
@@ -7,6 +10,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -15,7 +19,9 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import br.com.micropicpaychallenge.authorization.AuthorizeService;
 import br.com.micropicpaychallenge.notification.NotificationService;
+import br.com.micropicpaychallenge.wallet.Wallet;
 import br.com.micropicpaychallenge.wallet.WalletRepository;
+import br.com.micropicpaychallenge.wallet.WalletType;
 
 public class TransactionServiceTest {
 
@@ -38,6 +44,29 @@ public class TransactionServiceTest {
     public void setUp(){
         MockitoAnnotations.openMocks(this);
         transactionService = new TransactionService(transactionRepository, walletRepository, authorizeService, notificationService);
+    }
+
+    @Test
+    public void testCreateTransaction(){
+        var transaction = new Transaction(null, 2L, 1L, BigDecimal.valueOf(10L), LocalDateTime.now());
+        var payee = new Wallet(1L, "Fulano", 111111111L, "email@test.com", "12345", WalletType.SHOPKEEPER.getValue(), BigDecimal.valueOf(1000));
+        var payer = new Wallet(2L, "Fulano", 111111111L, "email@test.com", "12345", WalletType.COMMON.getValue(), BigDecimal.valueOf(1000));
+
+        when(walletRepository.findById(anyLong()))
+        .thenReturn(Optional.of(payee))
+        .thenReturn(Optional.of(payer));
+
+        when(transactionRepository.save(any())).thenReturn(transaction);
+        when(walletRepository.save(any()))
+        .thenReturn(payer)
+        .thenReturn(payee);
+        
+        doNothing().when(authorizeService).authorize(transaction);
+        doNothing().when(notificationService).notify(transaction);
+
+        var response = transactionService.createTransaction(transaction);
+
+        Assertions.assertThat(response).isNotNull();
     }
 
     @Test
