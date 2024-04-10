@@ -1,6 +1,6 @@
 # Micro Picpay Challenge
 
-Este projeto foi desenvolvido através do [víde: Picpay simplificado com Java e Spring Boot!](https://www.youtube.com/watch?v=YcuscoiIN14) da Giuliana Bezerra. 
+Este projeto foi desenvolvido através do [vídeo: Picpay simplificado com Java e Spring Boot!](https://www.youtube.com/watch?v=YcuscoiIN14) da Giuliana Bezerra. 
 
 Ele consiste duas funcionalidades de realizar transações de pagamento entre dois usuários distintos, sendo um do tipo pagador e outro do tipo recebedor.
 
@@ -32,6 +32,14 @@ Ele consiste duas funcionalidades de realizar transações de pagamento entre do
 
 
 ## Aprendizados
+* Uso de records
+* Configuração de topico kafka
+* Uso da classe RestClient para chamada externa de serviços
 
+## Adicionais
+* Testes unitários das classes TransactionController e TransactionService
 
-## Cobertura de testes
+* Inclusão do Swagger
+![Swagger](Doc/Swagger.png)
+
+Para acessar o Swagger localmente, é necessário subir a aplicação e chamar a url no navegador"http://localhost:8080/swagger-ui/index.html#/
